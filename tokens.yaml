@@ -1,0 +1,248 @@
+# ============================================================
+#  Single source of truth — Fluent-2-style multi-ramp palette
+# ============================================================
+#  Layers:
+#    base      : white / black primitives
+#    ramp      : 9 hues × 11 shades (Tailwind-tuned) — primitive layer
+#    surface   : page / module backgrounds        }
+#    border    : module borders, dividers          } semantic layer,
+#    text      : foreground text (emphasis)         > all references
+#    line      : arrows, grid, axis spines         } into ramp.*
+#    method    : semantic roles for paper narrative}
+#    method_soft : fills paired with method.* borders
+#    series      : categorical data-viz (8 colors)
+#    sequential  : monochrome ramps for heatmaps/ordinal data
+#    diverging   : two-hue ramps for +/- data
+#    font        : typography
+#
+#  Interpolation: ${path.to.token} for references,
+#                 ${fn:a,b,...} for derivations (see core/resolvers.py).
+# ============================================================
+
+base:
+  white: "#FFFFFF"
+  black: "#000000"
+
+# ============================================================
+#  PRIMITIVE LAYER — 9 hues × 11 shades (Tailwind-tuned)
+# ============================================================
+#  Use: always reference ramp.<hue>_<shade> from the semantic layer,
+#       never hard-code hex below this section.
+#  Keys are flat (slate_50 not slate.50) for unambiguous interpolation.
+ramp:
+  # ---- neutrals -----
+  slate_50:   "#F8FAFC"
+  slate_100:  "#F1F5F9"
+  slate_200:  "#E2E8F0"
+  slate_300:  "#CBD5E1"
+  slate_400:  "#94A3B8"
+  slate_500:  "#64748B"
+  slate_600:  "#475569"
+  slate_700:  "#334155"
+  slate_800:  "#1E293B"
+  slate_900:  "#0F172A"
+  slate_950:  "#020617"
+
+  # ---- blue (primary brand) -----
+  blue_50:    "#EFF6FF"
+  blue_100:   "#DBEAFE"
+  blue_200:   "#BFDBFE"
+  blue_300:   "#93C5FD"
+  blue_400:   "#60A5FA"
+  blue_500:   "#3B82F6"
+  blue_600:   "#2563EB"
+  blue_700:   "#1D4ED8"
+  blue_800:   "#1E40AF"
+  blue_900:   "#1E3A8A"
+  blue_950:   "#172554"
+
+  # ---- orange -----
+  orange_50:  "#FFF7ED"
+  orange_100: "#FFEDD5"
+  orange_200: "#FED7AA"
+  orange_300: "#FDBA74"
+  orange_400: "#FB923C"
+  orange_500: "#F97316"
+  orange_600: "#EA580C"
+  orange_700: "#C2410C"
+  orange_800: "#9A3412"
+  orange_900: "#7C2D12"
+  orange_950: "#431407"
+
+  # ---- emerald -----
+  emerald_50:  "#ECFDF5"
+  emerald_100: "#D1FAE5"
+  emerald_200: "#A7F3D0"
+  emerald_300: "#6EE7B7"
+  emerald_400: "#34D399"
+  emerald_500: "#10B981"
+  emerald_600: "#059669"
+  emerald_700: "#047857"
+  emerald_800: "#065F46"
+  emerald_900: "#064E3B"
+  emerald_950: "#022C22"
+
+  # ---- violet -----
+  violet_50:  "#F5F3FF"
+  violet_100: "#EDE9FE"
+  violet_200: "#DDD6FE"
+  violet_300: "#C4B5FD"
+  violet_400: "#A78BFA"
+  violet_500: "#8B5CF6"
+  violet_600: "#7C3AED"
+  violet_700: "#6D28D9"
+  violet_800: "#5B21B6"
+  violet_900: "#4C1D95"
+  violet_950: "#2E1065"
+
+  # ---- red -----
+  red_50:     "#FEF2F2"
+  red_100:    "#FEE2E2"
+  red_200:    "#FECACA"
+  red_300:    "#FCA5A5"
+  red_400:    "#F87171"
+  red_500:    "#EF4444"
+  red_600:    "#DC2626"
+  red_700:    "#B91C1C"
+  red_800:    "#991B1B"
+  red_900:    "#7F1D1D"
+  red_950:    "#450A0A"
+
+  # ---- amber -----
+  amber_50:   "#FFFBEB"
+  amber_100:  "#FEF3C7"
+  amber_200:  "#FDE68A"
+  amber_300:  "#FCD34D"
+  amber_400:  "#FBBF24"
+  amber_500:  "#F59E0B"
+  amber_600:  "#D97706"
+  amber_700:  "#B45309"
+  amber_800:  "#92400E"
+  amber_900:  "#78350F"
+  amber_950:  "#451A03"
+
+  # ---- cyan -----
+  cyan_50:    "#ECFEFF"
+  cyan_100:   "#CFFAFE"
+  cyan_200:   "#A5F3FC"
+  cyan_300:   "#67E8F9"
+  cyan_400:   "#22D3EE"
+  cyan_500:   "#06B6D4"
+  cyan_600:   "#0891B2"
+  cyan_700:   "#0E7490"
+  cyan_800:   "#155E75"
+  cyan_900:   "#164E63"
+  cyan_950:   "#083344"
+
+  # ---- rose (pink) -----
+  rose_50:    "#FFF1F2"
+  rose_100:   "#FFE4E6"
+  rose_200:   "#FECDD3"
+  rose_300:   "#FDA4AF"
+  rose_400:   "#FB7185"
+  rose_500:   "#F43F5E"
+  rose_600:   "#E11D48"
+  rose_700:   "#BE123C"
+  rose_800:   "#9F1239"
+  rose_900:   "#881337"
+  rose_950:   "#4C0519"
+
+# ============================================================
+#  SEMANTIC LAYER — everything below references ramp.*
+# ============================================================
+
+surface:
+  bg:         "${base.white}"
+  subtle:     "${ramp.slate_50}"
+  muted:      "${ramp.slate_100}"
+  emphasis:   "${ramp.slate_200}"
+
+border:
+  subtle:     "${ramp.slate_200}"
+  default:    "${ramp.slate_300}"
+  strong:     "${ramp.slate_500}"
+
+text:
+  primary:    "${ramp.slate_900}"
+  secondary:  "${ramp.slate_600}"
+  muted:      "${ramp.slate_400}"
+  inverse:    "${base.white}"
+
+line:
+  arrow:      "${border.strong}"
+  grid:       "${ramp.slate_100}"
+  axis:       "${border.default}"
+
+# ---- paper-narrative roles -------------------------------------------
+method:
+  ours:       "${ramp.blue_600}"       # #2563EB — your method
+  baseline:   "${ramp.slate_400}"      # neutral grey
+  highlight:  "${ramp.orange_500}"     # key finding / callout
+  success:    "${ramp.emerald_500}"    # improvement
+  warning:    "${ramp.amber_500}"      # trade-off / caveat
+  danger:     "${ramp.red_500}"        # failure / regression
+  info:       "${ramp.cyan_500}"       # auxiliary info
+
+# ---- soft fills paired with method.* borders -------------------------
+method_soft:
+  ours:       "${ramp.blue_50}"
+  baseline:   "${ramp.slate_100}"
+  highlight:  "${ramp.orange_50}"
+  success:    "${ramp.emerald_50}"
+  warning:    "${ramp.amber_50}"
+  danger:     "${ramp.red_50}"
+  info:       "${ramp.cyan_50}"
+
+# ---- medium fills (for badges, tags, emphasized modules) -------------
+method_soft_200:
+  ours:       "${ramp.blue_200}"
+  baseline:   "${ramp.slate_200}"
+  highlight:  "${ramp.orange_200}"
+  success:    "${ramp.emerald_200}"
+  warning:    "${ramp.amber_200}"
+  danger:     "${ramp.red_200}"
+  info:       "${ramp.cyan_200}"
+
+# ============================================================
+#  DATA VIZ — categorical / sequential / diverging
+# ============================================================
+
+# Categorical series (up to 8 distinguishable at a glance).
+# Order tuned so adjacent pairs are hue-distant for small-N plots.
+series:
+  s1:         "${ramp.blue_600}"
+  s2:         "${ramp.orange_500}"
+  s3:         "${ramp.emerald_500}"
+  s4:         "${ramp.violet_500}"
+  s5:         "${ramp.red_500}"
+  s6:         "${ramp.cyan_500}"
+  s7:         "${ramp.amber_500}"
+  s8:         "${ramp.rose_500}"
+
+# Sequential palettes — use for heatmaps, ordinal categories,
+# single-variable gradients. 5 stops each; matplotlib will interp.
+sequential:
+  blue:       ["${ramp.blue_100}",    "${ramp.blue_300}",    "${ramp.blue_500}",    "${ramp.blue_700}",    "${ramp.blue_900}"]
+  emerald:    ["${ramp.emerald_100}", "${ramp.emerald_300}", "${ramp.emerald_500}", "${ramp.emerald_700}", "${ramp.emerald_900}"]
+  orange:     ["${ramp.orange_100}",  "${ramp.orange_300}",  "${ramp.orange_500}",  "${ramp.orange_700}",  "${ramp.orange_900}"]
+  slate:      ["${ramp.slate_100}",   "${ramp.slate_300}",   "${ramp.slate_500}",   "${ramp.slate_700}",   "${ramp.slate_900}"]
+
+# Diverging palettes — use for signed data (gain/loss, correlation).
+# Odd number of stops; middle is neutral (near-white).
+diverging:
+  redblue:    ["${ramp.red_700}", "${ramp.red_300}",  "${base.white}", "${ramp.blue_300}",    "${ramp.blue_700}"]
+  orangeblue: ["${ramp.orange_700}", "${ramp.orange_300}", "${base.white}", "${ramp.blue_300}", "${ramp.blue_700}"]
+  redgreen:   ["${ramp.red_700}", "${ramp.red_300}",  "${base.white}", "${ramp.emerald_300}", "${ramp.emerald_700}"]
+
+# ============================================================
+#  TYPOGRAPHY
+# ============================================================
+font:
+  family:      "Inter, Helvetica Neue, Aptos, Segoe UI, Arial, DejaVu Sans, sans-serif"
+  family_ppt:  "Inter"
+  family_mono: "JetBrains Mono, Menlo, Consolas, monospace"
+  size_base:   10
+  size_small:  8
+  size_title:  11
+  weight_body: 400
+  weight_bold: 600

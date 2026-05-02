@@ -1,0 +1,92 @@
+# paper.mplstyle — generated from tokens.yaml
+# Load via:  plt.style.use('<path>/paper.mplstyle')
+
+# ---- Figure / background ------------------------------------------------
+figure.facecolor      : FFFFFF
+figure.edgecolor      : FFFFFF
+figure.dpi            : 150
+savefig.facecolor     : FFFFFF
+savefig.edgecolor     : FFFFFF
+savefig.dpi           : 300
+savefig.bbox          : tight
+savefig.pad_inches    : 0.02
+
+# ---- Axes ---------------------------------------------------------------
+axes.facecolor        : FFFFFF
+axes.edgecolor        : CBD5E1
+axes.linewidth        : 0.8
+axes.labelcolor       : 0F172A
+axes.labelsize        : 10
+axes.titlesize        : 11
+axes.titlecolor       : 0F172A
+axes.titlepad         : 6
+axes.labelpad         : 4
+axes.spines.top       : False
+axes.spines.right     : False
+axes.spines.left      : True
+axes.spines.bottom    : True
+axes.axisbelow        : True
+axes.prop_cycle       : cycler('color', ['2563EB', 'F97316', '10B981', '8B5CF6', 'EF4444', '06B6D4', 'F59E0B', 'F43F5E'])
+
+# ---- Grid ---------------------------------------------------------------
+axes.grid             : True
+axes.grid.axis        : y
+grid.color            : F1F5F9
+grid.linestyle        : -
+grid.linewidth        : 0.6
+grid.alpha            : 1.0
+
+# ---- Ticks --------------------------------------------------------------
+xtick.color           : 475569
+xtick.labelcolor      : 475569
+xtick.labelsize       : 8
+xtick.direction       : out
+xtick.major.size      : 3
+xtick.major.width     : 0.8
+xtick.minor.size      : 1.5
+xtick.minor.width     : 0.6
+ytick.color           : 475569
+ytick.labelcolor      : 475569
+ytick.labelsize       : 8
+ytick.direction       : out
+ytick.major.size      : 3
+ytick.major.width     : 0.8
+ytick.minor.size      : 1.5
+ytick.minor.width     : 0.6
+
+# ---- Lines / markers ----------------------------------------------------
+lines.linewidth       : 1.6
+lines.markersize      : 4.5
+lines.markeredgewidth : 0
+patch.linewidth       : 0.6
+patch.edgecolor       : CBD5E1
+
+# ---- Legend -------------------------------------------------------------
+legend.frameon        : False
+legend.fontsize       : 8
+legend.labelcolor     : 0F172A
+legend.handlelength   : 1.6
+legend.handletextpad  : 0.5
+legend.columnspacing  : 1.2
+legend.borderaxespad  : 0.4
+
+# ---- Text / fonts -------------------------------------------------------
+font.family           : sans-serif
+font.sans-serif       : Inter, Helvetica Neue, Aptos, Segoe UI, Arial, DejaVu Sans, sans-serif
+font.weight           : 400
+font.size             : 10
+text.color            : 0F172A
+axes.titleweight      : 600
+axes.labelweight      : 400
+mathtext.default      : regular
+
+# ---- Error bars / bar plots --------------------------------------------
+errorbar.capsize      : 2.5
+
+# ---- Image / color maps -------------------------------------------------
+image.cmap            : viridis
+
+# ---- Figure layout ------------------------------------------------------
+figure.figsize        : 3.5, 2.4
+figure.autolayout     : False
+figure.constrained_layout.use : True
