@@ -12,9 +12,13 @@ Theme color slot mapping (PowerPoint gives users these 12 slots):
   hlink        hyperlink color
   folHlink     followed hyperlink color
 
-We map method.ours -> accent1 so "Ours" in PPT matches "Ours" in figures.
-Accent order is tuned so the color picker's first 3 are already maximally
-distinct (blue / vermilion / green).
+Slot mapping in this build:
+  accent1  ← series.s1            (primary; same blue as the line-plot s1)
+  accent2  ← series.s2            (secondary categorical)
+  accent3  ← status.success       (green)
+  accent4  ← status.warning       (amber)
+  accent5  ← series.s5            (purple — secondary categorical)
+  accent6  ← series.s6            (cyan — secondary categorical)
 """
 
 from __future__ import annotations
@@ -24,7 +28,7 @@ from pathlib import Path
 
 from jinja2 import Template
 
-from core.loader import load
+from core.loader import load_with_meta
 from core.resolvers import darken
 
 THIS = Path(__file__).resolve().parent
@@ -45,16 +49,17 @@ def _render_theme_xml(t: dict) -> str:
         lt1=_hex6(t["surface"]["bg"]),
         dk2=_hex6(t["text"]["secondary"]),
         lt2=_hex6(t["surface"]["subtle"]),
-        # Accents — order chosen for maximal distinctness in the picker
-        accent1=_hex6(t["method"]["ours"]),      # blue
-        accent2=_hex6(t["method"]["highlight"]), # vermilion
-        accent3=_hex6(t["method"]["success"]),   # green
-        accent4=_hex6(t["method"]["warning"]),   # orange
-        accent5=_hex6(t["series"]["s5"]),        # purple
-        accent6=_hex6(t["series"]["s6"]),        # sky blue
-        # Links
-        hlink=_hex6(t["method"]["ours"]),
-        folHlink=_hex6(darken(t["method"]["ours"], 0.12)),
+        # Accents — series.s1 is the primary slot, status.success/warning
+        # take the green/amber slots since they're stable UI vocabulary.
+        accent1=_hex6(t["series"]["s1"]),         # blue (primary)
+        accent2=_hex6(t["series"]["s2"]),         # orange (secondary)
+        accent3=_hex6(t["status"]["success"]),    # green
+        accent4=_hex6(t["status"]["warning"]),    # amber
+        accent5=_hex6(t["series"]["s5"]),         # purple (categorical)
+        accent6=_hex6(t["series"]["s6"]),         # cyan (categorical)
+        # Links — use series.s1 so they match the primary brand slot
+        hlink=_hex6(t["series"]["s1"]),
+        folHlink=_hex6(darken(t["series"]["s1"], 0.12)),
         # Fonts — PowerPoint wants a single typeface name, not a fallback list.
         # If the user's Windows lacks Inter, PPT falls back to Calibri/Aptos.
         font_major=t["font"]["family_ppt"],
@@ -78,7 +83,7 @@ ROOT_RELS_XML = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 
 def build() -> None:
-    t = load()
+    t, _meta = load_with_meta()
     theme_xml = _render_theme_xml(t)
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
@@ -88,8 +93,8 @@ def build() -> None:
         z.writestr("theme/theme1.xml", theme_xml)
 
     # Quick summary of what the picker will show:
-    accents = [t["method"]["ours"], t["method"]["highlight"],
-               t["method"]["success"], t["method"]["warning"],
+    accents = [t["series"]["s1"], t["series"]["s2"],
+               t["status"]["success"], t["status"]["warning"],
                t["series"]["s5"], t["series"]["s6"]]
     print(f"wrote {OUT}")
     print(f"  accents 1-6: {' '.join(accents)}")

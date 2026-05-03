@@ -1,9 +1,12 @@
 """Emit Tokens Studio JSON for Figma.
 
 Format reference: https://docs.tokens.studio/manage-sets/json-schema
-We emit a single set called "global"; each token has {value, type}.
+We emit a single set called "global"; each token has {value, type, description}.
 This works with Tokens Studio on free Figma (imports as Styles) and on
 Pro (imports as Variables).
+
+`description` per token is sourced from the family-level `_meta.use` so
+designers see the family's intent in the Figma inspector.
 """
 
 from __future__ import annotations
@@ -11,7 +14,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from core.loader import load
+from core.loader import load_with_meta
 
 OUT = Path(__file__).resolve().parent.parent.parent / "dist" / "tokens-figma.json"
 
@@ -20,7 +23,7 @@ OUT = Path(__file__).resolve().parent.parent.parent / "dist" / "tokens-figma.jso
 _COLOR_GROUPS = (
     "base", "ramp",
     "surface", "border", "text", "line",
-    "method", "method_soft", "method_soft_200",
+    "status",
     "series",
 )
 
@@ -28,24 +31,31 @@ _COLOR_GROUPS = (
 _COLOR_LIST_GROUPS = ("sequential", "diverging")
 
 
-def _walk_colors(tokens: dict) -> dict:
+def _entry(value: str, description: str) -> dict:
+    e = {"value": value, "type": "color"}
+    if description:
+        e["description"] = description
+    return e
+
+
+def _walk_colors(tokens: dict, meta: dict) -> dict:
     out: dict = {}
     for group in _COLOR_GROUPS:
         if group not in tokens:
             continue
+        desc = (meta.get(group) or {}).get("use", "")
         out[group] = {
-            name: {"value": value, "type": "color"}
+            name: _entry(value, desc)
             for name, value in tokens[group].items()
         }
     for group in _COLOR_LIST_GROUPS:
         if group not in tokens:
             continue
-        # Expand each palette into stop_0..stop_N tokens (Tokens Studio
-        # doesn't have a native list-of-colors type).
+        desc = (meta.get(group) or {}).get("use", "")
         out[group] = {}
         for pname, stops in tokens[group].items():
             for i, hex_ in enumerate(stops):
-                out[group][f"{pname}_{i}"] = {"value": hex_, "type": "color"}
+                out[group][f"{pname}_{i}"] = _entry(hex_, desc)
     return out
 
 
@@ -63,12 +73,12 @@ def _walk_typography(tokens: dict) -> dict:
 
 
 def build() -> None:
-    t = load()
-    payload = {"global": {**_walk_colors(t), **_walk_typography(t)}}
+    t, meta = load_with_meta()
+    payload = {"global": {**_walk_colors(t, meta), **_walk_typography(t)}}
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(payload, indent=2, ensure_ascii=False))
     n_colors = sum(len(payload["global"][g]) for g in _COLOR_GROUPS if g in payload["global"])
-    print(f"wrote {OUT}  ({n_colors} color tokens)")
+    print(f"wrote {OUT}  ({n_colors} color tokens, with descriptions)")
 
 
 if __name__ == "__main__":

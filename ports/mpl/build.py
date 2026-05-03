@@ -1,24 +1,31 @@
 """Emit paper.mplstyle — matplotlib rc file tuned for academic figures.
 
-Design choices (so the chart visually belongs with the pipeline theme):
-  * Series colors are Okabe–Ito, same 6 used for method/highlight roles.
-    The first series == method.ours, so "Ours" is the same blue in
-    both pipeline diagrams and line plots.
-  * Axes/grid/text pull from the Primer neutral ramp — no black,
-    no new grays introduced here.
-  * Grid is drawn *under* data, barely visible (line.grid is a
-    lightened border.subtle).
+Design choices (so the chart visually belongs with the rest of the schema):
+  * Series colors are the categorical palette from tokens.yaml (8 hues
+    chosen for max hue-distance on small-N plots). series.s1 is the
+    "primary" slot — assign it to your method / first condition.
+  * Axes/grid/text pull from the neutral ramp via surface/text/line —
+    no black, no new grays introduced here.
+  * Grid drawn *under* data, barely visible (line.grid is the lightest
+    slate stop, basically a hairline).
   * No top/right spines — cleaner, more common in recent ML papers.
   * Legend has no frame (matches the flat aesthetic of pipeline figs).
+
+The header of the generated file lists every token family used, with
+the family's `_meta.use` description, so anyone reading the .mplstyle
+knows where each color came from.
 """
 
 from __future__ import annotations
 
 from pathlib import Path
 
-from core.loader import load
+from core.loader import load_with_meta
 
 OUT = Path(__file__).resolve().parent.parent.parent / "dist" / "paper.mplstyle"
+
+# Families read by this rc. Keep in sync with the f-string body below.
+_FAMILIES_USED = ("surface", "text", "border", "line", "series", "font")
 
 
 def _bare(h: str) -> str:
@@ -27,8 +34,22 @@ def _bare(h: str) -> str:
     return h.lstrip("#")
 
 
+def _doc_header(meta: dict) -> str:
+    lines = [
+        "# paper.mplstyle — generated from tokens.yaml",
+        "# Load via:  plt.style.use('<path>/paper.mplstyle')",
+        "#",
+        "# Token families used by this rc:",
+    ]
+    for fam in _FAMILIES_USED:
+        m = meta.get(fam) or {}
+        use = m.get("use", "—")
+        lines.append(f"#   {fam:<10s} — {use}")
+    return "\n".join(lines)
+
+
 def build() -> None:
-    t_raw = load()
+    t_raw, meta = load_with_meta()
     # Strip '#' from every color string in the tree for mplstyle output.
     # Simpler than threading _bare() through every f-string below.
     def strip(d):
@@ -39,8 +60,7 @@ def build() -> None:
     series_keys = [k for k in sorted(t["series"]) if k.startswith("s")]
     cycle = ", ".join(t["series"][k] for k in series_keys)
 
-    rc = f"""# paper.mplstyle — generated from tokens.yaml
-# Load via:  plt.style.use('<path>/paper.mplstyle')
+    rc = f"""{_doc_header(meta)}
 
 # ---- Figure / background ------------------------------------------------
 figure.facecolor      : {t['surface']['bg']}

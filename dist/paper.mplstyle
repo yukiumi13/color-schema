@@ -1,5 +1,13 @@
 # paper.mplstyle — generated from tokens.yaml
 # Load via:  plt.style.use('<path>/paper.mplstyle')
+#
+# Token families used by this rc:
+#   surface    — page / module backgrounds (4 levels, light → darker)
+#   text       — foreground text (hierarchical)
+#   border     — module borders / dividers
+#   line       — chart lines: arrows / grid / axis
+#   series     — categorical data viz, ≤ 8 classes (lines / grouped bars / scatter)
+#   font       — typography: family / size / weight
 
 # ---- Figure / background ------------------------------------------------
 figure.facecolor      : FFFFFF

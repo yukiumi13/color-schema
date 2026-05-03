@@ -411,333 +411,322 @@
     "surface": {
       "bg": {
         "value": "#FFFFFF",
-        "type": "color"
+        "type": "color",
+        "description": "page / module backgrounds (4 levels, light → darker)"
       },
       "subtle": {
         "value": "#F8FAFC",
-        "type": "color"
+        "type": "color",
+        "description": "page / module backgrounds (4 levels, light → darker)"
       },
       "muted": {
         "value": "#F1F5F9",
-        "type": "color"
+        "type": "color",
+        "description": "page / module backgrounds (4 levels, light → darker)"
       },
       "emphasis": {
         "value": "#E2E8F0",
-        "type": "color"
+        "type": "color",
+        "description": "page / module backgrounds (4 levels, light → darker)"
       }
     },
     "border": {
       "subtle": {
         "value": "#E2E8F0",
-        "type": "color"
+        "type": "color",
+        "description": "module borders / dividers"
       },
       "default": {
         "value": "#CBD5E1",
-        "type": "color"
+        "type": "color",
+        "description": "module borders / dividers"
       },
       "strong": {
         "value": "#64748B",
-        "type": "color"
+        "type": "color",
+        "description": "module borders / dividers"
       }
     },
     "text": {
       "primary": {
         "value": "#0F172A",
-        "type": "color"
+        "type": "color",
+        "description": "foreground text (hierarchical)"
       },
       "secondary": {
         "value": "#475569",
-        "type": "color"
+        "type": "color",
+        "description": "foreground text (hierarchical)"
       },
       "muted": {
         "value": "#94A3B8",
-        "type": "color"
+        "type": "color",
+        "description": "foreground text (hierarchical)"
       },
       "inverse": {
         "value": "#FFFFFF",
-        "type": "color"
+        "type": "color",
+        "description": "foreground text (hierarchical)"
       }
     },
     "line": {
       "arrow": {
         "value": "#64748B",
-        "type": "color"
+        "type": "color",
+        "description": "chart lines: arrows / grid / axis"
       },
       "grid": {
         "value": "#F1F5F9",
-        "type": "color"
+        "type": "color",
+        "description": "chart lines: arrows / grid / axis"
       },
       "axis": {
         "value": "#CBD5E1",
-        "type": "color"
+        "type": "color",
+        "description": "chart lines: arrows / grid / axis"
       }
     },
-    "method": {
-      "ours": {
-        "value": "#2563EB",
-        "type": "color"
-      },
-      "baseline": {
-        "value": "#94A3B8",
-        "type": "color"
-      },
-      "highlight": {
-        "value": "#F97316",
-        "type": "color"
-      },
+    "status": {
       "success": {
         "value": "#10B981",
-        "type": "color"
+        "type": "color",
+        "description": "universal UI status — success / warning / danger / info"
       },
       "warning": {
         "value": "#F59E0B",
-        "type": "color"
+        "type": "color",
+        "description": "universal UI status — success / warning / danger / info"
       },
       "danger": {
         "value": "#EF4444",
-        "type": "color"
+        "type": "color",
+        "description": "universal UI status — success / warning / danger / info"
       },
       "info": {
         "value": "#06B6D4",
-        "type": "color"
-      }
-    },
-    "method_soft": {
-      "ours": {
-        "value": "#EFF6FF",
-        "type": "color"
-      },
-      "baseline": {
-        "value": "#F1F5F9",
-        "type": "color"
-      },
-      "highlight": {
-        "value": "#FFF7ED",
-        "type": "color"
-      },
-      "success": {
-        "value": "#ECFDF5",
-        "type": "color"
-      },
-      "warning": {
-        "value": "#FFFBEB",
-        "type": "color"
-      },
-      "danger": {
-        "value": "#FEF2F2",
-        "type": "color"
-      },
-      "info": {
-        "value": "#ECFEFF",
-        "type": "color"
-      }
-    },
-    "method_soft_200": {
-      "ours": {
-        "value": "#BFDBFE",
-        "type": "color"
-      },
-      "baseline": {
-        "value": "#E2E8F0",
-        "type": "color"
-      },
-      "highlight": {
-        "value": "#FED7AA",
-        "type": "color"
-      },
-      "success": {
-        "value": "#A7F3D0",
-        "type": "color"
-      },
-      "warning": {
-        "value": "#FDE68A",
-        "type": "color"
-      },
-      "danger": {
-        "value": "#FECACA",
-        "type": "color"
-      },
-      "info": {
-        "value": "#A5F3FC",
-        "type": "color"
+        "type": "color",
+        "description": "universal UI status — success / warning / danger / info"
       }
     },
     "series": {
       "s1": {
         "value": "#2563EB",
-        "type": "color"
+        "type": "color",
+        "description": "categorical data viz, ≤ 8 classes (lines / grouped bars / scatter)"
       },
       "s2": {
         "value": "#F97316",
-        "type": "color"
+        "type": "color",
+        "description": "categorical data viz, ≤ 8 classes (lines / grouped bars / scatter)"
       },
       "s3": {
         "value": "#10B981",
-        "type": "color"
+        "type": "color",
+        "description": "categorical data viz, ≤ 8 classes (lines / grouped bars / scatter)"
       },
       "s4": {
         "value": "#8B5CF6",
-        "type": "color"
+        "type": "color",
+        "description": "categorical data viz, ≤ 8 classes (lines / grouped bars / scatter)"
       },
       "s5": {
         "value": "#EF4444",
-        "type": "color"
+        "type": "color",
+        "description": "categorical data viz, ≤ 8 classes (lines / grouped bars / scatter)"
       },
       "s6": {
         "value": "#06B6D4",
-        "type": "color"
+        "type": "color",
+        "description": "categorical data viz, ≤ 8 classes (lines / grouped bars / scatter)"
       },
       "s7": {
         "value": "#F59E0B",
-        "type": "color"
+        "type": "color",
+        "description": "categorical data viz, ≤ 8 classes (lines / grouped bars / scatter)"
       },
       "s8": {
         "value": "#F43F5E",
-        "type": "color"
+        "type": "color",
+        "description": "categorical data viz, ≤ 8 classes (lines / grouped bars / scatter)"
       }
     },
     "sequential": {
       "blue_0": {
         "value": "#DBEAFE",
-        "type": "color"
+        "type": "color",
+        "description": "heatmaps / single-variable gradients / ordered categories"
       },
       "blue_1": {
         "value": "#93C5FD",
-        "type": "color"
+        "type": "color",
+        "description": "heatmaps / single-variable gradients / ordered categories"
       },
       "blue_2": {
         "value": "#3B82F6",
-        "type": "color"
+        "type": "color",
+        "description": "heatmaps / single-variable gradients / ordered categories"
       },
       "blue_3": {
         "value": "#1D4ED8",
-        "type": "color"
+        "type": "color",
+        "description": "heatmaps / single-variable gradients / ordered categories"
       },
       "blue_4": {
         "value": "#1E3A8A",
-        "type": "color"
+        "type": "color",
+        "description": "heatmaps / single-variable gradients / ordered categories"
       },
       "emerald_0": {
         "value": "#D1FAE5",
-        "type": "color"
+        "type": "color",
+        "description": "heatmaps / single-variable gradients / ordered categories"
       },
       "emerald_1": {
         "value": "#6EE7B7",
-        "type": "color"
+        "type": "color",
+        "description": "heatmaps / single-variable gradients / ordered categories"
       },
       "emerald_2": {
         "value": "#10B981",
-        "type": "color"
+        "type": "color",
+        "description": "heatmaps / single-variable gradients / ordered categories"
       },
       "emerald_3": {
         "value": "#047857",
-        "type": "color"
+        "type": "color",
+        "description": "heatmaps / single-variable gradients / ordered categories"
       },
       "emerald_4": {
         "value": "#064E3B",
-        "type": "color"
+        "type": "color",
+        "description": "heatmaps / single-variable gradients / ordered categories"
       },
       "orange_0": {
         "value": "#FFEDD5",
-        "type": "color"
+        "type": "color",
+        "description": "heatmaps / single-variable gradients / ordered categories"
       },
       "orange_1": {
         "value": "#FDBA74",
-        "type": "color"
+        "type": "color",
+        "description": "heatmaps / single-variable gradients / ordered categories"
       },
       "orange_2": {
         "value": "#F97316",
-        "type": "color"
+        "type": "color",
+        "description": "heatmaps / single-variable gradients / ordered categories"
       },
       "orange_3": {
         "value": "#C2410C",
-        "type": "color"
+        "type": "color",
+        "description": "heatmaps / single-variable gradients / ordered categories"
       },
       "orange_4": {
         "value": "#7C2D12",
-        "type": "color"
+        "type": "color",
+        "description": "heatmaps / single-variable gradients / ordered categories"
       },
       "slate_0": {
         "value": "#F1F5F9",
-        "type": "color"
+        "type": "color",
+        "description": "heatmaps / single-variable gradients / ordered categories"
       },
       "slate_1": {
         "value": "#CBD5E1",
-        "type": "color"
+        "type": "color",
+        "description": "heatmaps / single-variable gradients / ordered categories"
       },
       "slate_2": {
         "value": "#64748B",
-        "type": "color"
+        "type": "color",
+        "description": "heatmaps / single-variable gradients / ordered categories"
       },
       "slate_3": {
         "value": "#334155",
-        "type": "color"
+        "type": "color",
+        "description": "heatmaps / single-variable gradients / ordered categories"
       },
       "slate_4": {
         "value": "#0F172A",
-        "type": "color"
+        "type": "color",
+        "description": "heatmaps / single-variable gradients / ordered categories"
       }
     },
     "diverging": {
       "redblue_0": {
         "value": "#B91C1C",
-        "type": "color"
+        "type": "color",
+        "description": "signed data: gain/loss, correlation, residuals"
       },
       "redblue_1": {
         "value": "#FCA5A5",
-        "type": "color"
+        "type": "color",
+        "description": "signed data: gain/loss, correlation, residuals"
       },
       "redblue_2": {
         "value": "#FFFFFF",
-        "type": "color"
+        "type": "color",
+        "description": "signed data: gain/loss, correlation, residuals"
       },
       "redblue_3": {
         "value": "#93C5FD",
-        "type": "color"
+        "type": "color",
+        "description": "signed data: gain/loss, correlation, residuals"
       },
       "redblue_4": {
         "value": "#1D4ED8",
-        "type": "color"
+        "type": "color",
+        "description": "signed data: gain/loss, correlation, residuals"
       },
       "orangeblue_0": {
         "value": "#C2410C",
-        "type": "color"
+        "type": "color",
+        "description": "signed data: gain/loss, correlation, residuals"
       },
       "orangeblue_1": {
         "value": "#FDBA74",
-        "type": "color"
+        "type": "color",
+        "description": "signed data: gain/loss, correlation, residuals"
       },
       "orangeblue_2": {
         "value": "#FFFFFF",
-        "type": "color"
+        "type": "color",
+        "description": "signed data: gain/loss, correlation, residuals"
       },
       "orangeblue_3": {
         "value": "#93C5FD",
-        "type": "color"
+        "type": "color",
+        "description": "signed data: gain/loss, correlation, residuals"
       },
       "orangeblue_4": {
         "value": "#1D4ED8",
-        "type": "color"
+        "type": "color",
+        "description": "signed data: gain/loss, correlation, residuals"
       },
       "redgreen_0": {
         "value": "#B91C1C",
-        "type": "color"
+        "type": "color",
+        "description": "signed data: gain/loss, correlation, residuals"
       },
       "redgreen_1": {
         "value": "#FCA5A5",
-        "type": "color"
+        "type": "color",
+        "description": "signed data: gain/loss, correlation, residuals"
       },
       "redgreen_2": {
         "value": "#FFFFFF",
-        "type": "color"
+        "type": "color",
+        "description": "signed data: gain/loss, correlation, residuals"
       },
       "redgreen_3": {
         "value": "#6EE7B7",
-        "type": "color"
+        "type": "color",
+        "description": "signed data: gain/loss, correlation, residuals"
       },
       "redgreen_4": {
         "value": "#047857",
-        "type": "color"
+        "type": "color",
+        "description": "signed data: gain/loss, correlation, residuals"
       }
     },
     "font": {

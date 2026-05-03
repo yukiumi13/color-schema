@@ -1,11 +1,12 @@
-"""Expanded preview — shows the full palette so you can eyeball:
-  (a) is the ramp coverage enough?
-  (b) do the semantic roles feel right?
-  (c) do categorical/sequential/diverging palettes harmonize?
+"""Family-card preview — schema as a visual config card stack.
 
-Layout (2 rows × 4 cols = 8 panels):
-  row 1: ramp swatch grid    | semantic swatches  | pipeline diagram  | bar plot
-  row 2: series demo (lines) | multi-series bars  | sequential heatmap| diverging heatmap
+Layout (top → bottom):
+  1. Title strip
+  2. Primitive layer    : full ramp grid (9 hues × 11 shades)
+  3. Semantic layer     : 8 family cards (surface/text/border/line +
+                                          method/method_soft/sequential/diverging)
+                          each card shows: name | use | pairs_with | swatches
+  4. Live usage examples: 4 demo charts proving the schema works in real plots
 """
 
 from __future__ import annotations
@@ -16,7 +17,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import numpy as np
 
-from core.loader import load
+from core.loader import load_with_meta
 from ports.mpl.cmaps import register_all as register_cmaps
 
 ROOT = Path(__file__).resolve().parent
@@ -28,10 +29,94 @@ RAMP_SHADES = ("50", "100", "200", "300", "400",
                "500", "600", "700", "800", "900", "950")
 
 
-# ---------- panel drawers ---------------------------------------------------
+# ---------- card primitive --------------------------------------------------
+
+def draw_family_card(ax, family_name: str, family_data: dict,
+                     meta: dict, t: dict) -> None:
+    """One configurable card showing: family name + use + pairs_with + swatches.
+
+    Handles both scalar families (method.ours = "#hex") and list families
+    (sequential.blue = ["#hex", ...]).
+    """
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.axis("off")
+
+    # ---- Header band (subtle bg) -----------------------------------------
+    ax.add_patch(patches.Rectangle(
+        (0, 0.86), 1, 0.14,
+        facecolor=t["surface"]["subtle"], edgecolor="none",
+        transform=ax.transAxes))
+    ax.text(0.04, 0.93, family_name,
+            fontsize=10, fontweight="bold",
+            color=t["text"]["primary"], va="center",
+            transform=ax.transAxes)
+
+    # ---- Use one-liner ---------------------------------------------------
+    use = meta.get("use", "—") if meta else "—"
+    ax.text(0.04, 0.79, use, fontsize=7,
+            color=t["text"]["secondary"], va="center",
+            transform=ax.transAxes)
+
+    # ---- pairs_with tags -------------------------------------------------
+    pairs = (meta.get("pairs_with") or []) if meta else []
+    if pairs:
+        tag_str = "+ " + "  ".join(pairs)
+        ax.text(0.04, 0.72, tag_str, fontsize=6,
+                color=t["text"]["muted"], va="center", style="italic",
+                transform=ax.transAxes)
+
+    # ---- Swatches --------------------------------------------------------
+    items = list(family_data.items())
+    n = len(items)
+    if n == 0:
+        return
+
+    body_top = 0.66
+    body_bottom = 0.04
+    row_h = (body_top - body_bottom) / n
+    sw_pad = row_h * 0.15
+
+    for i, (key, value) in enumerate(items):
+        y_top = body_top - i * row_h
+        y_bot = y_top - row_h + sw_pad
+
+        if isinstance(value, str) and value.startswith("#"):
+            # Scalar swatch row: [color block][name][hex]
+            ax.add_patch(patches.Rectangle(
+                (0.04, y_bot), 0.18, row_h - sw_pad,
+                facecolor=value, edgecolor="none",
+                transform=ax.transAxes))
+            ax.text(0.26, y_bot + (row_h - sw_pad) / 2, key,
+                    fontsize=7, color=t["text"]["primary"],
+                    va="center", transform=ax.transAxes)
+            ax.text(0.96, y_bot + (row_h - sw_pad) / 2, value.upper(),
+                    fontsize=6, family="monospace",
+                    color=t["text"]["muted"],
+                    va="center", ha="right", transform=ax.transAxes)
+
+        elif isinstance(value, list):
+            # Gradient row: [name][gradient strip across N stops]
+            ax.text(0.04, y_bot + (row_h - sw_pad) / 2, key,
+                    fontsize=7, color=t["text"]["primary"],
+                    va="center", transform=ax.transAxes)
+            n_stops = len(value)
+            grad_x0, grad_x1 = 0.30, 0.96
+            grad_w = (grad_x1 - grad_x0) / n_stops
+            for j, stop in enumerate(value):
+                ax.add_patch(patches.Rectangle(
+                    (grad_x0 + j * grad_w, y_bot),
+                    grad_w, row_h - sw_pad,
+                    facecolor=stop, edgecolor="none",
+                    transform=ax.transAxes))
+
+
+# ---------- ramp grid -------------------------------------------------------
 
 def draw_ramps(ax, t):
-    ax.set_title("color ramp", loc="left", color=t["text"]["primary"])
+    ax.set_title("primitive layer · 9 hues × 11 shades",
+                 loc="left", fontsize=10, fontweight="bold",
+                 color=t["text"]["primary"], pad=8)
     ax.set_xlim(0, len(RAMP_SHADES))
     ax.set_ylim(0, len(RAMP_HUES))
     ax.invert_yaxis()
@@ -53,70 +138,46 @@ def draw_ramps(ax, t):
                 facecolor=t["ramp"][key], edgecolor="none"))
 
 
-def draw_semantics(ax, t):
-    ax.set_title("semantic tokens", loc="left", color=t["text"]["primary"])
-    ax.axis("off")
-    roles = ["ours", "baseline", "highlight", "success",
-             "warning", "danger", "info"]
-    for i, role in enumerate(roles):
-        y = len(roles) - 1 - i
-        # solid swatch (method.*)
-        ax.add_patch(patches.FancyBboxPatch(
-            (0.05, y + 0.15), 0.22, 0.7,
-            boxstyle="round,pad=0,rounding_size=0.06",
-            facecolor=t["method"][role], edgecolor="none"))
-        # soft swatch (method_soft.*)
-        ax.add_patch(patches.FancyBboxPatch(
-            (0.30, y + 0.15), 0.22, 0.7,
-            boxstyle="round,pad=0,rounding_size=0.06",
-            facecolor=t["method_soft"][role],
-            edgecolor=t["method"][role], linewidth=1.0))
-        # soft-200 swatch (method_soft_200.*)
-        ax.add_patch(patches.FancyBboxPatch(
-            (0.55, y + 0.15), 0.22, 0.7,
-            boxstyle="round,pad=0,rounding_size=0.06",
-            facecolor=t["method_soft_200"][role], edgecolor="none"))
-        ax.text(0.82, y + 0.5, role, va="center",
-                fontsize=8, color=t["text"]["primary"])
-    ax.set_xlim(0, 1.3); ax.set_ylim(0, len(roles))
-
+# ---------- live usage demos ------------------------------------------------
 
 def draw_pipeline(ax, t):
+    """Demonstrates how to assign roles at the consumer site.
+
+    Schema doesn't pre-bind colors to "ours/baseline/highlight" —
+    instead the user picks: series.s1 for the primary condition, a
+    neutral slate stop for baseline, series.s2 for the standout.
+    Soft fills are pulled from the same hue's _50 / _100 ramp shade.
+    """
     ax.set_xlim(0, 10); ax.set_ylim(0, 4); ax.axis("off")
-    ax.set_title("pipeline (PPT style)", loc="left", color=t["text"]["primary"])
+    ax.set_title("usage · pipeline (roles assigned at use site)",
+                 loc="left", fontsize=9,
+                 color=t["text"]["primary"], pad=6)
+
+    # Project-local role mapping — illustrative, not in tokens.yaml.
+    primary      = t["series"]["s1"];   primary_soft   = t["ramp"]["blue_50"]
+    neutral      = t["ramp"]["slate_400"]; neutral_soft = t["ramp"]["slate_100"]
+    standout     = t["series"]["s2"];   standout_soft  = t["ramp"]["orange_50"]
 
     def box(x, y, w, h, fill, edge, label):
         ax.add_patch(patches.FancyBboxPatch(
             (x, y), w, h, boxstyle="round,pad=0.02,rounding_size=0.12",
             facecolor=fill, edgecolor=edge, linewidth=1.2))
         ax.text(x + w/2, y + h/2, label, ha="center", va="center",
-                fontsize=9, color=t["text"]["primary"])
+                fontsize=8, color=t["text"]["primary"])
 
     def arrow(x0, y0, x1, y1):
         ax.annotate("", xy=(x1, y1), xytext=(x0, y0),
                     arrowprops=dict(arrowstyle="->", color=t["line"]["arrow"],
                                     lw=1.0, shrinkA=2, shrinkB=2))
 
-    box(0.3, 1.5, 1.8, 1.0, t["surface"]["subtle"],       t["border"]["subtle"], "Input")
-    box(3.0, 2.3, 1.8, 1.0, t["method_soft"]["ours"],      t["method"]["ours"],      "Ours")
-    box(3.0, 0.7, 1.8, 1.0, t["method_soft"]["baseline"],  t["method"]["baseline"],  "Baseline")
-    box(5.7, 1.5, 1.8, 1.0, t["surface"]["subtle"],       t["border"]["subtle"], "Merge")
-    box(8.2, 1.5, 1.5, 1.0, t["method_soft"]["highlight"], t["method"]["highlight"], "Result")
+    box(0.3, 1.5, 1.8, 1.0, t["surface"]["subtle"], t["border"]["subtle"], "Input")
+    box(3.0, 2.3, 1.8, 1.0, primary_soft,  primary,  "Ours")
+    box(3.0, 0.7, 1.8, 1.0, neutral_soft,  neutral,  "Baseline")
+    box(5.7, 1.5, 1.8, 1.0, t["surface"]["subtle"], t["border"]["subtle"], "Merge")
+    box(8.2, 1.5, 1.5, 1.0, standout_soft, standout, "Result")
     arrow(2.1, 2.0, 3.0, 2.8); arrow(2.1, 2.0, 3.0, 1.2)
     arrow(4.8, 2.8, 5.7, 2.0); arrow(4.8, 1.2, 5.7, 2.0)
     arrow(7.5, 2.0, 8.2, 2.0)
-
-
-def draw_bars(ax, t):
-    methods = ["A", "B", "C", "D", "Ours"]
-    vals = [0.58, 0.66, 0.71, 0.74, 0.83]
-    colors = [t["method"]["baseline"]] * 4 + [t["method"]["ours"]]
-    ax.bar(methods, vals, color=colors, edgecolor="none")
-    ax.set_ylim(0, 1.0)
-    ax.set_ylabel("accuracy")
-    ax.set_title("bar plot", loc="left", color=t["text"]["primary"])
-    ax.text(4, 0.83 + 0.02, "0.83", ha="center",
-            color=t["method"]["ours"], fontsize=9, weight="bold")
 
 
 def draw_lines(ax, t):
@@ -128,35 +189,17 @@ def draw_lines(ax, t):
         ax.plot(x, np.sin(x - phase) * (1 - 0.07 * i), label=lbl,
                 linewidth=(2.0 if i == 0 else 1.3))
     ax.set_xlabel("epoch"); ax.set_ylabel("metric")
-    ax.set_title("categorical series (8)", loc="left", color=t["text"]["primary"])
-    ax.legend(ncol=2, loc="lower left", fontsize=7)
-
-
-def draw_grouped_bars(ax, t):
-    groups = ["Task 1", "Task 2", "Task 3", "Task 4"]
-    x = np.arange(len(groups))
-    width = 0.18
-    series = ["Ours", "Base A", "Base B", "Base C"]
-    data = [[0.82, 0.88, 0.76, 0.91],
-            [0.70, 0.74, 0.68, 0.80],
-            [0.66, 0.71, 0.64, 0.77],
-            [0.62, 0.68, 0.60, 0.73]]
-    colors = [t["series"][f"s{i+1}"] for i in range(4)]
-    for i, (lbl, vals, c) in enumerate(zip(series, data, colors)):
-        ax.bar(x + (i - 1.5) * width, vals, width, label=lbl, color=c)
-    ax.set_xticks(x); ax.set_xticklabels(groups)
-    ax.set_ylim(0, 1.0); ax.set_ylabel("accuracy")
-    ax.set_title("grouped bars", loc="left", color=t["text"]["primary"])
-    ax.legend(ncol=4, loc="upper center", fontsize=7,
-              bbox_to_anchor=(0.5, -0.15))
+    ax.set_title("usage · series (8-way categorical)", loc="left",
+                 fontsize=9, color=t["text"]["primary"], pad=6)
+    ax.legend(ncol=2, loc="lower left", fontsize=6)
 
 
 def draw_sequential_heatmap(ax, t):
     rng = np.random.default_rng(1)
     data = rng.random((6, 10)) * 0.6 + np.linspace(0.1, 0.8, 10)[None, :]
     im = ax.imshow(data, cmap="paper.blue", aspect="auto")
-    ax.set_title("sequential heatmap (paper.blue)", loc="left",
-                 color=t["text"]["primary"])
+    ax.set_title("usage · sequential heatmap", loc="left",
+                 fontsize=9, color=t["text"]["primary"], pad=6)
     ax.set_xticks([]); ax.set_yticks([])
     plt.colorbar(im, ax=ax, shrink=0.8)
 
@@ -166,39 +209,68 @@ def draw_diverging_heatmap(ax, t):
     data = rng.standard_normal((6, 10))
     im = ax.imshow(data, cmap="paper.redblue", aspect="auto",
                    vmin=-2.5, vmax=2.5)
-    ax.set_title("diverging heatmap (paper.redblue)", loc="left",
-                 color=t["text"]["primary"])
+    ax.set_title("usage · diverging heatmap", loc="left",
+                 fontsize=9, color=t["text"]["primary"], pad=6)
     ax.set_xticks([]); ax.set_yticks([])
     plt.colorbar(im, ax=ax, shrink=0.8)
 
 
 # ---------- main -----------------------------------------------------------
 
+# Cards to render and which family in `tokens` they pull from.
+CARDS = [
+    ("surface",         "surface"),
+    ("text",            "text"),
+    ("border",          "border"),
+    ("line",            "line"),
+    ("status",          "status"),
+    ("series",          "series"),
+    ("sequential",      "sequential"),
+    ("diverging",       "diverging"),
+]
+
+
 def main():
-    t = load()
+    t, meta = load_with_meta()
     plt.style.use(str(ROOT / "dist" / "paper.mplstyle"))
     register_cmaps()
 
-    # Override the style's constrained_layout so our explicit spacing wins.
+    # The mplstyle enables constrained_layout, which fights with our explicit
+    # gridspec margins; disable for this figure only.
     with plt.rc_context({"figure.constrained_layout.use": False}):
-        fig, axes = plt.subplots(2, 4, figsize=(18, 8.5),
-                                 gridspec_kw={"hspace": 0.5, "wspace": 0.3,
-                                              "top": 0.92, "bottom": 0.08,
-                                              "left": 0.04, "right": 0.98})
+        fig = plt.figure(figsize=(16, 14))
+        fig.patch.set_facecolor(t["surface"]["bg"])
 
-    draw_ramps(axes[0, 0], t)
-    draw_semantics(axes[0, 1], t)
-    draw_pipeline(axes[0, 2], t)
-    draw_bars(axes[0, 3], t)
+        gs = fig.add_gridspec(
+            nrows=4, ncols=4,
+            height_ratios=[1.2, 2.4, 2.4, 2.2],
+            hspace=0.32, wspace=0.18,
+            top=0.94, bottom=0.05, left=0.04, right=0.97,
+        )
 
-    draw_lines(axes[1, 0], t)
-    draw_grouped_bars(axes[1, 1], t)
-    draw_sequential_heatmap(axes[1, 2], t)
-    draw_diverging_heatmap(axes[1, 3], t)
+        # Row 0: full-width ramp grid
+        ax_ramp = fig.add_subplot(gs[0, :])
+        draw_ramps(ax_ramp, t)
 
-    fig.suptitle("theme preview — Fluent-style ramps + semantic tokens",
-                 fontsize=13, color=t["text"]["primary"], y=0.98)
-    fig.savefig(OUT, dpi=180)
+        # Rows 1-2: 8 family cards
+        for idx, (label, family_key) in enumerate(CARDS):
+            row = 1 + idx // 4
+            col = idx % 4
+            ax = fig.add_subplot(gs[row, col])
+            draw_family_card(ax, label, t.get(family_key, {}),
+                             meta.get(family_key, {}), t)
+
+        # Row 3: live usage demos
+        draw_pipeline(fig.add_subplot(gs[3, 0]), t)
+        draw_lines(fig.add_subplot(gs[3, 1]), t)
+        draw_sequential_heatmap(fig.add_subplot(gs[3, 2]), t)
+        draw_diverging_heatmap(fig.add_subplot(gs[3, 3]), t)
+
+        fig.suptitle("color schema preview · primitive · semantic cards · live usage",
+                     fontsize=14, fontweight="bold",
+                     color=t["text"]["primary"], y=0.985)
+
+        fig.savefig(OUT, dpi=180, facecolor=t["surface"]["bg"])
     print(f"wrote {OUT}")
 
 

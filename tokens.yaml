@@ -1,19 +1,25 @@
 # ============================================================
-#  Single source of truth — Fluent-2-style multi-ramp palette
+#  Single source of truth — multi-ramp palette + role-neutral semantics
 # ============================================================
 #  Layers:
-#    base      : white / black primitives
-#    ramp      : 9 hues × 11 shades (Tailwind-tuned) — primitive layer
-#    surface   : page / module backgrounds        }
-#    border    : module borders, dividers          } semantic layer,
-#    text      : foreground text (emphasis)         > all references
-#    line      : arrows, grid, axis spines         } into ramp.*
-#    method    : semantic roles for paper narrative}
-#    method_soft : fills paired with method.* borders
-#    series      : categorical data-viz (8 colors)
-#    sequential  : monochrome ramps for heatmaps/ordinal data
-#    diverging   : two-hue ramps for +/- data
-#    font        : typography
+#    base       : white / black primitives
+#    ramp       : 9 hues × 11 shades (Tailwind-tuned) — primitive layer
+#    surface    : page / module backgrounds          }
+#    border     : module borders, dividers           } semantic layer,
+#    text       : foreground text (emphasis)         > references into ramp.*
+#    line       : arrows, grid, axis spines          }
+#    series     : categorical data-viz (8 colors)
+#    sequential : monochrome ramps for heatmaps / ordinal data
+#    diverging  : two-hue ramps for +/- data
+#    status     : universal UI status (success / warn / danger / info)
+#    font       : typography
+#
+#  No project-narrative roles (e.g. ours / baseline) live here — those
+#  belong in a project-specific overlay that maps e.g. series.s1 → "ours".
+#
+#  Each family has a `_meta` block ({ use, pairs_with, description }) that
+#  documents intent; loader.py strips _meta from the resolved tree but
+#  exposes it via load_with_meta() for preview and per-port descriptions.
 #
 #  Interpolation: ${path.to.token} for references,
 #                 ${fn:a,b,...} for derivations (see core/resolvers.py).
@@ -152,56 +158,55 @@ ramp:
 # ============================================================
 
 surface:
+  _meta:
+    use: "page / module backgrounds (4 levels, light → darker)"
+    pairs_with: [text, border]
+    description: "bg is page-level; subtle/muted/emphasis are module-level. Pair every surface with a text token to guarantee contrast."
   bg:         "${base.white}"
   subtle:     "${ramp.slate_50}"
   muted:      "${ramp.slate_100}"
   emphasis:   "${ramp.slate_200}"
 
 border:
+  _meta:
+    use: "module borders / dividers"
+    pairs_with: [surface]
   subtle:     "${ramp.slate_200}"
   default:    "${ramp.slate_300}"
   strong:     "${ramp.slate_500}"
 
 text:
+  _meta:
+    use: "foreground text (hierarchical)"
+    pairs_with: [surface]
+    description: "primary > secondary > muted in emphasis; inverse is white-on-dark for inverted surfaces."
   primary:    "${ramp.slate_900}"
   secondary:  "${ramp.slate_600}"
   muted:      "${ramp.slate_400}"
   inverse:    "${base.white}"
 
 line:
+  _meta:
+    use: "chart lines: arrows / grid / axis"
+    pairs_with: [surface, text]
   arrow:      "${border.strong}"
   grid:       "${ramp.slate_100}"
   axis:       "${border.default}"
 
-# ---- paper-narrative roles -------------------------------------------
-method:
-  ours:       "${ramp.blue_600}"       # #2563EB — your method
-  baseline:   "${ramp.slate_400}"      # neutral grey
-  highlight:  "${ramp.orange_500}"     # key finding / callout
-  success:    "${ramp.emerald_500}"    # improvement
-  warning:    "${ramp.amber_500}"      # trade-off / caveat
-  danger:     "${ramp.red_500}"        # failure / regression
-  info:       "${ramp.cyan_500}"       # auxiliary info
-
-# ---- soft fills paired with method.* borders -------------------------
-method_soft:
-  ours:       "${ramp.blue_50}"
-  baseline:   "${ramp.slate_100}"
-  highlight:  "${ramp.orange_50}"
-  success:    "${ramp.emerald_50}"
-  warning:    "${ramp.amber_50}"
-  danger:     "${ramp.red_50}"
-  info:       "${ramp.cyan_50}"
-
-# ---- medium fills (for badges, tags, emphasized modules) -------------
-method_soft_200:
-  ours:       "${ramp.blue_200}"
-  baseline:   "${ramp.slate_200}"
-  highlight:  "${ramp.orange_200}"
-  success:    "${ramp.emerald_200}"
-  warning:    "${ramp.amber_200}"
-  danger:     "${ramp.red_200}"
-  info:       "${ramp.cyan_200}"
+# ---- universal UI status (success / warn / danger / info) -----------
+# These four are the only role-bound colors that live in core, because
+# their meaning is consistent across every product / paper / dashboard.
+# Project-narrative roles (ours / baseline / highlight) belong in a
+# per-project overlay, not here.
+status:
+  _meta:
+    use: "universal UI status — success / warning / danger / info"
+    pairs_with: [text.inverse, surface.bg]
+    description: "stable UI vocabulary; pair with text.inverse on a filled chip, or use the same color as a border with surface.bg as the fill."
+  success:    "${ramp.emerald_500}"
+  warning:    "${ramp.amber_500}"
+  danger:     "${ramp.red_500}"
+  info:       "${ramp.cyan_500}"
 
 # ============================================================
 #  DATA VIZ — categorical / sequential / diverging
@@ -210,6 +215,10 @@ method_soft_200:
 # Categorical series (up to 8 distinguishable at a glance).
 # Order tuned so adjacent pairs are hue-distant for small-N plots.
 series:
+  _meta:
+    use: "categorical data viz, ≤ 8 classes (lines / grouped bars / scatter)"
+    pairs_with: [text.primary, surface.bg]
+    description: "hue-distance maximized; pick s1, s2, s3 in order — don't cherry-pick (e.g. avoid s1+s5 only). s1 == method.ours so 'Ours' is the same blue everywhere."
   s1:         "${ramp.blue_600}"
   s2:         "${ramp.orange_500}"
   s3:         "${ramp.emerald_500}"
@@ -222,6 +231,10 @@ series:
 # Sequential palettes — use for heatmaps, ordinal categories,
 # single-variable gradients. 5 stops each; matplotlib will interp.
 sequential:
+  _meta:
+    use: "heatmaps / single-variable gradients / ordered categories"
+    pairs_with: [text.primary]
+    description: "use the whole ramp — don't pick a single stop. 5 stops each; matplotlib interpolates between them. light → dark encodes magnitude."
   blue:       ["${ramp.blue_100}",    "${ramp.blue_300}",    "${ramp.blue_500}",    "${ramp.blue_700}",    "${ramp.blue_900}"]
   emerald:    ["${ramp.emerald_100}", "${ramp.emerald_300}", "${ramp.emerald_500}", "${ramp.emerald_700}", "${ramp.emerald_900}"]
   orange:     ["${ramp.orange_100}",  "${ramp.orange_300}",  "${ramp.orange_500}",  "${ramp.orange_700}",  "${ramp.orange_900}"]
@@ -230,6 +243,10 @@ sequential:
 # Diverging palettes — use for signed data (gain/loss, correlation).
 # Odd number of stops; middle is neutral (near-white).
 diverging:
+  _meta:
+    use: "signed data: gain/loss, correlation, residuals"
+    pairs_with: [text.primary]
+    description: "midpoint is neutral (near-white); ends carry opposite meaning. Cool (blue) usually = negative/decrease, warm (red/orange) = positive/increase."
   redblue:    ["${ramp.red_700}", "${ramp.red_300}",  "${base.white}", "${ramp.blue_300}",    "${ramp.blue_700}"]
   orangeblue: ["${ramp.orange_700}", "${ramp.orange_300}", "${base.white}", "${ramp.blue_300}", "${ramp.blue_700}"]
   redgreen:   ["${ramp.red_700}", "${ramp.red_300}",  "${base.white}", "${ramp.emerald_300}", "${ramp.emerald_700}"]
@@ -238,6 +255,10 @@ diverging:
 #  TYPOGRAPHY
 # ============================================================
 font:
+  _meta:
+    use: "typography: family / size / weight"
+    pairs_with: [text]
+    description: "family is a fallback list (mpl, figma); family_ppt is a single name (PowerPoint doesn't support fallback chains)."
   family:      "Inter, Helvetica Neue, Aptos, Segoe UI, Arial, DejaVu Sans, sans-serif"
   family_ppt:  "Inter"
   family_mono: "JetBrains Mono, Menlo, Consolas, monospace"
